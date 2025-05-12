@@ -3,20 +3,18 @@ import os
 
 st.set_page_config(page_title="Catálogo de imágenes", layout="wide")
 
-col_espacio_izq, col_logo, col_titulo, col_espacio_der = st.columns([1, 2, 6, 1])
-with col_logo:
-    st.image("logo.png", width=120)
+# Título y dirección
+st.title("Catálogo de imágenes")
+st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
 
-with col_titulo:
-    st.markdown("<h1 style='margin-top: 18px;'>Nuestro Catálogo Deportivo</h1>", unsafe_allow_html=True)
-    
-# Ruta relativa a la carpeta de imágenes dentro del repo
-carpeta = "catalogo"
-# Obtener lista de imágenes con extensiones válidas
-extensiones_validas = (".png", ".jpg", ".jpeg", ".jfif")
+# Ruta de la carpeta de imágenes dentro del repositorio
+carpeta = "imagenes"
+
+# Soportar .jfif además de otras extensiones
+extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 
-imagenes.sort()  # opcional, para mostrar en orden alfabético
+imagenes.sort()
 
 # Mostrar las imágenes en tabla (imagen + título + precio)
 for archivo in imagenes:
@@ -39,4 +37,4 @@ for archivo in imagenes:
 
         st.markdown("---")  # Separador visual
     except ValueError:
-        st.warning(f"El archivo '{archivo}' no tiene el formato esperado: 'nombre - precio.jpg'")
+        st.warning(f"El archivo '{archivo}' no tiene el formato esperado: 'nombre - precio.jfif'")
