@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 
-st.set_page_config(page_title="Nuestro Catálogo Deportivo", layout="wide")
+st.set_page_config(page_title="Importivos León", layout="wide")
 
 
 col1, col2 = st.columns([1, 5]) 
@@ -10,7 +10,7 @@ with col1:
     st.image("logo.png", width=60)  
 
 with col2:
-    st.title("Catálogo de imágenes")
+    st.title("Nuestro Catálogo Deportivo")
 
 
 st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
