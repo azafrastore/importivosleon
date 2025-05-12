@@ -3,7 +3,6 @@ import os
 
 st.set_page_config(page_title="Importivos León", layout="wide")
 
-# Crear las columnas para el logo y título
 col1, col2 = st.columns([1, 5])
 
 with col1:
@@ -12,10 +11,9 @@ with col1:
 with col2:
     st.title("Nuestro Catálogo Deportivo")
 
-# Dirección debajo del título
 st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
 
-# Ruta de la carpeta de imágenes dentro del repositorio
+
 carpeta = "catalogo"
 
 # Soportar .jfif además de otras extensiones
@@ -32,10 +30,10 @@ for archivo in imagenes:
         referencia, tallas, precio = nombre_archivo.split(" - ")
 
         # Formatear el precio con separadores de miles
-        precio_formateado = "{:,.0f}".format(int(precio))  # Convierte el precio en un número y lo formatea
+        precio_formateado = "{:,.0f}".format(int(precio)) 
 
         # Formatear las tallas
-        tallas_formateadas = tallas.replace(",", "<br>").replace("(", " ").replace(")", " piezas")
+        tallas_formateadas = tallas.replace(",", "<br>").replace("(", " ").replace(")", " par")
 
         # Crear las columnas para imagen, referencia y cantidades, y precio
         col1, col2, col3 = st.columns([2, 3, 1])
