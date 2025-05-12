@@ -30,6 +30,7 @@ for archivo in imagenes:
         # Separar título y precio usando el nombre del archivo
         nombre_archivo = os.path.splitext(archivo)[0]  # quita extensión
         titulo, precio = nombre_archivo.split(" - ")
+        precio_formateado = "{:,.0f}".format(int(precio))  # Convierte el precio en un número y lo formatea
 
         # Crear las columnas para imagen, título y precio
         col1, col2, col3 = st.columns([2, 3, 1])
@@ -41,7 +42,7 @@ for archivo in imagenes:
             st.markdown(f"### {titulo}")
 
         with col3:
-            st.markdown(f"<h4 style='color: green;'>${precio}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
         st.markdown("---") 
     except ValueError:
