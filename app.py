@@ -8,7 +8,7 @@ st.title("Catálogo de imágenes")
 st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
 
 # Ruta de la carpeta de imágenes dentro del repositorio
-carpeta = "imagenes"
+carpeta = "catalogo"
 
 # Soportar .jfif además de otras extensiones
 extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
