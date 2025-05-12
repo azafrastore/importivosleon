@@ -29,7 +29,7 @@ for archivo in imagenes:
         col1, col2, col3 = st.columns([2, 3, 1])
 
         with col1:
-            st.image(os.path.join(carpeta, archivo), use_column_width=True)
+            st.image(os.path.join(carpeta, archivo), use_container_width=True)
 
         with col2:
             st.markdown(f"### {titulo}")
