@@ -2,12 +2,18 @@ import streamlit as st
 import os
 
 st.set_page_config(page_title="Catálogo de imágenes", layout="wide")
-st.title("Catálogo de imágenes")
 
+col_espacio_izq, col_logo, col_titulo, col_espacio_der = st.columns([1, 2, 6, 1])
+with col_logo:
+    st.image("logo.png", width=60)
+
+with col_titulo:
+    st.markdown("<h1 style='margin-top: 18px;'>Nuestro catálogo deportivo</h1>", unsafe_allow_html=True)
+    
 # Ruta relativa a la carpeta de imágenes dentro del repo
 carpeta = "catalogo"
 # Obtener lista de imágenes con extensiones válidas
-extensiones_validas = (".png", ".jpg", ".jpeg", ".webp")
+extensiones_validas = (".png", ".jpg", ".jpeg", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 
 imagenes.sort()  # opcional, para mostrar en orden alfabético
