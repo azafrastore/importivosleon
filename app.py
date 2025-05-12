@@ -1,13 +1,21 @@
 import streamlit as st
 import os
 
-st.set_page_config(page_title="Catálogo de imágenes", layout="wide")
+st.set_page_config(page_title="Nuestro Catálogo Deportivo", layout="wide")
 
-# Título y dirección
-st.title("Catálogo de imágenes")
+
+col1, col2 = st.columns([1, 5]) 
+
+with col1:
+    st.image("logo.png", width=60)  
+
+with col2:
+    st.title("Catálogo de imágenes")
+
+
 st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
 
-# Ruta de la carpeta de imágenes dentro del repositorio
+
 carpeta = "catalogo"
 
 # Soportar .jfif además de otras extensiones
@@ -23,7 +31,7 @@ for archivo in imagenes:
         nombre_archivo = os.path.splitext(archivo)[0]  # quita extensión
         titulo, precio = nombre_archivo.split(" - ")
 
-        # Crear las columnas
+        # Crear las columnas para imagen, título y precio
         col1, col2, col3 = st.columns([2, 3, 1])
 
         with col1:
@@ -35,6 +43,6 @@ for archivo in imagenes:
         with col3:
             st.markdown(f"<h4 style='color: green;'>${precio}</h4>", unsafe_allow_html=True)
 
-        st.markdown("---")  # Separador visual
+        st.markdown("---") 
     except ValueError:
         st.warning(f"El archivo '{archivo}' no tiene el formato esperado: 'nombre - precio.jfif'")
