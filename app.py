@@ -5,10 +5,10 @@ st.set_page_config(page_title="Catálogo de imágenes", layout="wide")
 
 col_espacio_izq, col_logo, col_titulo, col_espacio_der = st.columns([1, 2, 6, 1])
 with col_logo:
-    st.image("logo.png", width=60)
+    st.image("logo.png", width=120)
 
 with col_titulo:
-    st.markdown("<h1 style='margin-top: 18px;'>Nuestro catálogo deportivo</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-top: 18px;'>Nuestro Catálogo Deportivo</h1>", unsafe_allow_html=True)
     
 # Ruta relativa a la carpeta de imágenes dentro del repo
 carpeta = "catalogo"
