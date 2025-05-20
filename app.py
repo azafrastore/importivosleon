@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import re
+import urllib.parse
 
 st.set_page_config(page_title="Importivos León", layout="wide")
 
@@ -39,7 +40,30 @@ if st.session_state.carrito:
 else:
     st.info("Tu carrito está vacío.")
 
+
+if st.session_state.carrito:
+    mensaje = "Hola, quiero hacer el siguiente pedido:\n\n"
+    total = 0
+
+    for item in st.session_state.carrito.values():
+        mensaje += f"- {item['referencia']} (Talla: {item['talla']}) x {item['cantidad']}\n"
+        total += item['cantidad'] * item['precio']
     
+    mensaje += f"\nTotal: ${total:,.0f}"
+    
+    # Codificar el mensaje
+    mensaje_codificado = urllib.parse.quote(mensaje)
+    
+    # Número de WhatsApp
+    numero_whatsapp = "+573115225576"  
+    
+    url_whatsapp = f"https://wa.me/{numero_whatsapp}?text={mensaje_codificado}"
+    
+    st.markdown(
+        f"<a href='{url_whatsapp}' target='_blank'><button style='background-color:#25D366;color:white;padding:10px 15px;border:none;border-radius:5px;'>Enviar pedido por WhatsApp</button></a>",
+        unsafe_allow_html=True
+    )
+
 carpeta = "catalogo"
 extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
