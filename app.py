@@ -75,7 +75,7 @@ for archivo in imagenes:
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
 talla_seleccionada = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
-# Mostrar productos
+
 for archivo in imagenes:
     try:
         nombre_archivo = os.path.splitext(archivo)[0]
