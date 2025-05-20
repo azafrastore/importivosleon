@@ -81,7 +81,7 @@ for i, archivo in enumerate(imagenes):
 
     producto_id = f"item_{i}"
     catalogo[producto_id] = {
-        "id": producto_id,
+        "producto_id": producto_id,
         "archivo": archivo,
         "referencia": referencia,
         "precio": precio,
@@ -121,7 +121,7 @@ for producto_id, item in catalogo.items():
             seleccionada = st.radio(
                 f"Talla para {producto_id}",
                 options=list(tallas_disponibles.keys()),
-                key=f"tallas_{archivo}",
+                key=f"tallas_{producto_id}",
                 horizontal=True,
                 index=0 if tallas_disponibles else None,
             )
