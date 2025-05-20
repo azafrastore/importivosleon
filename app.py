@@ -118,10 +118,10 @@ for archivo in imagenes:
                 with col_t1:
                     st.markdown(f"Talla {talla}: {stock} {'pares' if stock > 1 else 'par'}")
                 with col_t2:
-                    if st.button("-", key=f"remove_{referencia}_{talla}"):
+                    if st.button("➖ -1", key=f"remove_{referencia}_{talla}"):
                         quitar_del_carrito(referencia, talla)
                 with col_t3:
-                    if st.button("+", key=f"add_{referencia}_{talla}"):
+                    if st.button("➕ +1", key=f"add_{referencia}_{talla}"):
                         agregar_al_carrito(referencia, talla, precio)
         with col3:
             st.markdown(f"<h4 style='color: green;'>{precio_formateado}</h4>", unsafe_allow_html=True)
