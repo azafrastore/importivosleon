@@ -37,6 +37,7 @@ if st.session_state.carrito:
     st.success(f"**Total a pagar:** ${total:,.0f}".replace(",", "."))
     if st.button("🧹 Vaciar carrito"):
         st.session_state.carrito.clear()
+        st.rerun()
 else:
     st.info("Tu carrito está vacío.")
 
