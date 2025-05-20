@@ -142,4 +142,4 @@ for archivo in imagenes:
 
         st.markdown("---")
     except Exception as e:
-        st.warning(f"Error con archivo '{archivo}': {e}")
+        st.warning(f"Error con archivo '{archivo}': {e} ")
