@@ -94,15 +94,34 @@ for archivo in imagenes:
 
         with col3:
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
-            if st.button(f"Agregar al carrito - {referencia}"):
-                if archivo not in st.session_state.carrito:
-                    st.session_state.carrito[archivo] = {
-                        "referencia": referencia,
-                        "precio": precio,
-                        "cantidad": 1
-                    }
-                else:
-                    st.session_state.carrito[archivo]["cantidad"] += 1
+
+            for t, c in tallas:
+                clave = f"{archivo}_{t}"
+                cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
+
+                col_minus, col_plus, col_info = st.columns([1, 1, 3])
+                with col_minus:
+                    if st.button("-1", key=f"menos_{archivo}_{t}"):
+                        if cantidad_actual > 0:
+                            if clave in st.session_state.carrito:
+                                st.session_state.carrito[clave]["cantidad"] -= 1
+                                if st.session_state.carrito[clave]["cantidad"] <= 0:
+                                    del st.session_state.carrito[clave]
+
+                with col_plus:
+                    if st.button("+1", key=f"mas_{archivo}_{t}"):
+                        if clave in st.session_state.carrito:
+                            st.session_state.carrito[clave]["cantidad"] += 1
+                        else:
+                            st.session_state.carrito[clave] = {
+                                "referencia": referencia,
+                                "precio": precio,
+                                "talla": t,
+                                "cantidad": 1
+                            }
+
+                with col_info:
+                    st.write(f"Talla {t} | En carrito: {cantidad_actual}")
 
         st.markdown("---")
     except Exception as e:
