@@ -58,7 +58,7 @@ if st.session_state.carrito:
     # Número de WhatsApp
     numero_whatsapp = "+573115225576"  
     
-    url_whatsapp = f"https://wa.me/{numero_whatsapp}?text={mensaje_codificado}"
+    url_whatsapp = f"https://api.whatsapp.com/send?phone={numero_whatsapp}?text={mensaje_codificado}"
     
     st.markdown(
         f"<a href='{url_whatsapp}' target='_blank'><button style='background-color:#25D366;color:white;padding:10px 15px;border:none;border-radius:5px;'>Enviar pedido por WhatsApp</button></a>",
@@ -123,7 +123,7 @@ for archivo in imagenes:
                 clave = f"{archivo}_{t}"
                 cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
 
-                col_minus, col_plus, col_info = st.columns([1, 1, 3])
+                col_minus, col_info, col_plus = st.columns([1, 1, 3])
                 with col_minus:
                     if st.button("-1", key=f"menos_{archivo}_{t}"):
                         if cantidad_actual > 0:
@@ -131,6 +131,11 @@ for archivo in imagenes:
                                 st.session_state.carrito[clave]["cantidad"] -= 1
                                 if st.session_state.carrito[clave]["cantidad"] <= 0:
                                     del st.session_state.carrito[clave]
+
+                with col_info:
+                    plural = "pares" if int(c) > 1 else "par"
+                    #    st.markdown(f"- Talla {talla}: {cantidad} {plural}")
+                    st.write(f"Talla {t}: {c} {plural}| En carrito: {cantidad_actual}")
 
                 with col_plus:
                     if st.button("+1", key=f"mas_{archivo}_{t}"):
@@ -144,10 +149,7 @@ for archivo in imagenes:
                                 "cantidad": 1
                             }
 
-                with col_info:
-                    plural = "pares" if int(c) > 1 else "par"
-                    #    st.markdown(f"- Talla {talla}: {cantidad} {plural}")
-                    st.write(f"Talla {t}: {c} {plural}| En carrito: {cantidad_actual}")
+             
 
         st.markdown("---")
     except Exception as e:
