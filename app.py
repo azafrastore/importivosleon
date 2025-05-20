@@ -18,7 +18,7 @@ with col2:
 # Dirección del local
 st.markdown("<p style='font-size:16px; color: gray;'>Bucaramanga</p>", unsafe_allow_html=True)
 
-# Mostrar carrito
+
 st.markdown("## 🛒 Carrito de compras")
 if st.session_state.carrito:
     total = 0
