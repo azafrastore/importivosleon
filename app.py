@@ -138,6 +138,8 @@ for producto_id, item in catalogo.items():
                         st.session_state.carrito[clave]["cantidad"] -= 1
                         if st.session_state.carrito[clave]["cantidad"] <= 0:
                             del st.session_state.carrito[clave]
+                    st.experimental_rerun()
+                    
             with col_c:
                 st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
             with col_p:
@@ -151,6 +153,7 @@ for producto_id, item in catalogo.items():
                             "talla": seleccionada,
                             "cantidad": 1
                         }
+                    st.experimental_rerun()
 
         st.markdown("---")
     except Exception as e:
