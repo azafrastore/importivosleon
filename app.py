@@ -87,9 +87,9 @@ for archivo in imagenes:
 
         with col2:
             st.markdown(f"### {referencia}")
-            for talla, cantidad in tallas:
-                plural = "pares" if int(cantidad) > 1 else "par"
-                st.markdown(f"- Talla {talla}: {cantidad} {plural}")
+          #  for talla, cantidad in tallas:
+           #     plural = "pares" if int(cantidad) > 1 else "par"
+            #    st.markdown(f"- Talla {talla}: {cantidad} {plural}")
 
         with col3:
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
@@ -120,7 +120,9 @@ for archivo in imagenes:
                             }
 
                 with col_info:
-                    st.write(f"Talla {t} | En carrito: {cantidad_actual}")
+                    plural = "pares" if int(c) > 1 else "par"
+                    #    st.markdown(f"- Talla {talla}: {cantidad} {plural}")
+                    st.write(f"Talla {t}: {c} {plural}| En carrito: {cantidad_actual}")
 
         st.markdown("---")
     except Exception as e:
