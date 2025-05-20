@@ -118,42 +118,42 @@ for producto_id, item in catalogo.items():
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
             tallas_disponibles = {t: int(c) for t, c in tallas}
-            seleccionada = st.radio(
+            opciones_talla = ["Selecciona una talla"] + list(tallas_disponibles.keys())
+            seleccionada = st.selectbox(
                 f"Talla para {producto_id}",
-                options=list(tallas_disponibles.keys()),
+                options=opciones_talla,
                 key=f"tallas_{producto_id}",
-                horizontal=True,
-                index=0 if tallas_disponibles else None,
             )
 
-        # Mostrar controles de cantidad
-        clave = f"{producto_id}_{seleccionada}"
-        cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
+        if seleccionada == "Selecciona una talla":
+            st.warning("Selecciona una talla para agregar al carrito.")
+        else:
+            clave = f"{producto_id}_{seleccionada}"
+            cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
 
-        with col_qty:
-            col_m, col_c, col_p = st.columns([1, 1, 1])
-            with col_m:
-                if st.button("➖", key=f"menos_{clave}"):
-                    if clave in st.session_state.carrito:
-                        st.session_state.carrito[clave]["cantidad"] -= 1
-                        if st.session_state.carrito[clave]["cantidad"] <= 0:
-                            del st.session_state.carrito[clave]
-                    st.experimental_rerun()
-                    
-            with col_c:
-                st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
-            with col_p:
-                if st.button("➕", key=f"mas_{clave}"):
-                    if clave in st.session_state.carrito:
-                        st.session_state.carrito[clave]["cantidad"] += 1
-                    else:
-                        st.session_state.carrito[clave] = {
-                            "referencia": referencia,
-                            "precio": precio,
-                            "talla": seleccionada,
-                            "cantidad": 1
-                        }
-                    st.experimental_rerun()
+            with col_qty:
+                col_m, col_c, col_p = st.columns([1, 1, 1])
+                with col_m:
+                    if st.button("➖", key=f"menos_{clave}"):
+                        if clave in st.session_state.carrito:
+                            st.session_state.carrito[clave]["cantidad"] -= 1
+                            if st.session_state.carrito[clave]["cantidad"] <= 0:
+                                del st.session_state.carrito[clave]
+                            st.experimental_rerun()
+                with col_c:
+                    st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
+                with col_p:
+                    if st.button("➕", key=f"mas_{clave}"):
+                        if clave in st.session_state.carrito:
+                            st.session_state.carrito[clave]["cantidad"] += 1
+                        else:
+                            st.session_state.carrito[clave] = {
+                                "referencia": referencia,
+                                "precio": precio,
+                                "talla": seleccionada,
+                                "cantidad": 1
+                            }
+                        st.experimental_rerun()
 
 
         st.markdown("---")
