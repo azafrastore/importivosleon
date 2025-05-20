@@ -40,13 +40,12 @@ else:
     st.info("Tu carrito está vacío.")
 
     
-# Carpeta del catálogo
 carpeta = "catalogo"
 extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 imagenes.sort()
 
-# Obtener todas las tallas únicas desde los nombres de archivos
+
 tallas_disponibles = set()
 patron = re.compile(r"- ([\d,()]+) -")
 for archivo in imagenes:
@@ -60,7 +59,7 @@ for archivo in imagenes:
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
 talla_seleccionada = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
-# Mostrar productos según filtro
+
 for archivo in imagenes:
     try:
         nombre_archivo = os.path.splitext(archivo)[0]
