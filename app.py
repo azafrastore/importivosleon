@@ -61,7 +61,7 @@ extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 imagenes.sort()
 
-# Obtener tallas disponibles para filtro
+# Filtro por talla
 tallas_disponibles = set()
 patron = re.compile(r"- ([\d,()]+) -")
 for archivo in imagenes:
@@ -75,7 +75,7 @@ for archivo in imagenes:
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
 talla_seleccionada = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
-
+# Mostrar productos
 for archivo in imagenes:
     try:
         nombre_archivo = os.path.splitext(archivo)[0]
@@ -89,10 +89,9 @@ for archivo in imagenes:
         precio = int(partes[2].strip())
         precio_formateado = "{:,.0f}".format(precio).replace(",", ".")
 
-        # Obtener tallas y cantidades
-        tallas = re.findall(r"(\d+)\((\d+)\)", tallas_info)
+        tallas = re.findall(r"\d+", tallas_info)
         if talla_seleccionada != "Todas":
-            if not any(talla_seleccionada == t for t, _ in tallas):
+            if talla_seleccionada not in tallas:
                 continue
 
         col1, col2 = st.columns([2, 3])
@@ -102,31 +101,38 @@ for archivo in imagenes:
             st.markdown(f"### {referencia}")
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
-            for t, c in tallas:
-                clave = f"{archivo}_{t}"
-                cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
+            # Botones de tallas
+            st.markdown("**Selecciona una talla:**")
+            cols = st.columns(len(tallas))
+            for idx, talla in enumerate(tallas):
+                clave = f"{archivo}_{talla}"
+                if cols[idx].button(f"{talla}", key=f"agregar_{archivo}_{talla}"):
+                    if clave in st.session_state.carrito:
+                        st.session_state.carrito[clave]["cantidad"] += 1
+                    else:
+                        st.session_state.carrito[clave] = {
+                            "referencia": referencia,
+                            "precio": precio,
+                            "talla": talla,
+                            "cantidad": 1
+                        }
 
-                col_minus, col_info, col_plus = st.columns([1, 2, 2])
-                with col_minus:
-                    if st.button("-1", key=f"menos_{archivo}_{t}"):
-                        if cantidad_actual > 0:
+            # Mostrar controles de cantidad si ya está en el carrito
+            for talla in tallas:
+                clave = f"{archivo}_{talla}"
+                if clave in st.session_state.carrito:
+                    cantidad = st.session_state.carrito[clave]["cantidad"]
+                    col_menos, col_cantidad, col_mas = st.columns([1, 1, 1])
+                    with col_menos:
+                        if st.button("−", key=f"menos_{archivo}_{talla}"):
                             st.session_state.carrito[clave]["cantidad"] -= 1
                             if st.session_state.carrito[clave]["cantidad"] <= 0:
                                 del st.session_state.carrito[clave]
-                with col_info:
-                    plural = "pares" if int(c) > 1 else "par"
-                    st.write(f"Talla {t}: {c} {plural} | En carrito: {cantidad_actual}")
-                with col_plus:
-                    if st.button("+1", key=f"mas_{archivo}_{t}"):
-                        if clave in st.session_state.carrito:
+                    with col_cantidad:
+                        st.markdown(f"<div style='text-align:center; font-size:18px; padding-top:5px;'>{cantidad}</div>", unsafe_allow_html=True)
+                    with col_mas:
+                        if st.button("+", key=f"mas_{archivo}_{talla}"):
                             st.session_state.carrito[clave]["cantidad"] += 1
-                        else:
-                            st.session_state.carrito[clave] = {
-                                "referencia": referencia,
-                                "precio": precio,
-                                "talla": t,
-                                "cantidad": 1
-                            }
 
         st.markdown("---")
     except Exception as e:
