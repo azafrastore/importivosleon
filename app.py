@@ -121,7 +121,7 @@ for archivo in imagenes:
         with col_qty:
             col_m, col_c, col_p = st.columns([1, 1, 1])
             with col_m:
-                if st.button("−", key=f"menos_{clave}"):
+                if st.button("➖", key=f"menos_{clave}"):
                     if clave in st.session_state.carrito:
                         st.session_state.carrito[clave]["cantidad"] -= 1
                         if st.session_state.carrito[clave]["cantidad"] <= 0:
@@ -129,7 +129,7 @@ for archivo in imagenes:
             with col_c:
                 st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
             with col_p:
-                if st.button("+", key=f"mas_{clave}"):
+                if st.button("➕", key=f"mas_{clave}"):
                     if clave in st.session_state.carrito:
                         st.session_state.carrito[clave]["cantidad"] += 1
                     else:
