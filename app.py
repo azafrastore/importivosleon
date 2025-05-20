@@ -83,7 +83,7 @@ for archivo in imagenes:
         col1, col2 = st.columns([2, 3])
 
         with col1:
-            st.image(os.path.join(carpeta, archivo), use_container_width=True)
+            st.image(os.path.join(carpeta, archivo), width=150)
 
         with col2:
             st.markdown(f"### {referencia}")
