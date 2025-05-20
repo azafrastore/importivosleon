@@ -120,14 +120,12 @@ for producto_id, item in catalogo.items():
             tallas_disponibles = {t: int(c) for t, c in tallas}
             opciones_talla = ["Selecciona una talla"] + list(tallas_disponibles.keys())
             seleccionada = st.selectbox(
-                f"Talla para {producto_id}",
+                f"",
                 options=opciones_talla,
                 key=f"tallas_{producto_id}",
             )
 
-        if seleccionada == "Selecciona una talla":
-            st.warning("Selecciona una talla para agregar al carrito.")
-        else:
+        if seleccionada != "Selecciona una talla":
             clave = f"{producto_id}_{seleccionada}"
             cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
 
