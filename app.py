@@ -80,7 +80,7 @@ for archivo in imagenes:
                 continue  # No mostrar si la talla no está
 
         # Crear columnas para imagen, referencia y precio/botón
-        col1, col2, col3 = st.columns([2, 3, 2])
+        col1, col2 = st.columns([2, 3])
 
         with col1:
             st.image(os.path.join(carpeta, archivo), use_container_width=True)
@@ -91,7 +91,7 @@ for archivo in imagenes:
            #     plural = "pares" if int(cantidad) > 1 else "par"
             #    st.markdown(f"- Talla {talla}: {cantidad} {plural}")
 
-        with col3:
+        #with col3:
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
             for t, c in tallas:
