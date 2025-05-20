@@ -94,7 +94,7 @@ for archivo in imagenes:
 
         with col3:
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
-            if st.button(f"Agregar al carrito - {archivo}"):
+            if st.button(f"Agregar al carrito - {referencia}"):
                 if archivo not in st.session_state.carrito:
                     st.session_state.carrito[archivo] = {
                         "referencia": referencia,
