@@ -16,7 +16,7 @@ with col2:
     st.title("Nuestro Catálogo Deportivo")
 
 # Dirección del local
-st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size:16px; color: gray;'>Bucaramanga</p>", unsafe_allow_html=True)
 
 # Mostrar carrito
 st.markdown("## 🛒 Carrito de compras")
