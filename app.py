@@ -64,36 +64,48 @@ extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 imagenes.sort()
 
-# Filtrar tallas disponibles
+catalogo = {}
 tallas_disponibles = set()
 patron = re.compile(r"- ([\d,()]+) -")
-for archivo in imagenes:
-    nombre_archivo = os.path.splitext(archivo)[0]
-    coincidencia = patron.search(nombre_archivo)
-    if coincidencia:
-        tallas_info = coincidencia.group(1)
-        tallas = re.findall(r"\d+", tallas_info)
-        tallas_disponibles.update(tallas)
 
+for i, archivo in enumerate(imagenes):
+    nombre_archivo = os.path.splitext(archivo)[0]
+    partes = nombre_archivo.split(" - ")
+    if len(partes) != 3:
+        continue
+
+    referencia = partes[0].strip()
+    tallas_info = partes[1].strip()
+    precio = int(partes[2].strip())
+    tallas = re.findall(r"(\d+)\((\d+)\)", tallas_info)
+
+    producto_id = f"item_{i}"
+    catalogo[producto_id] = {
+        "id": producto_id,
+        "archivo": archivo,
+        "referencia": referencia,
+        "precio": precio,
+        "tallas": tallas
+    }
+
+    for t, _ in tallas:
+        tallas_disponibles.add(t)
+
+# Filtro por talla
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
-talla_filtro = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
+talla_seleccionada_filtro = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
 # Mostrar catálogo
-for archivo in imagenes:
+for producto_id, item in catalogo.items():
     try:
-        nombre_archivo = os.path.splitext(archivo)[0]
-        partes = nombre_archivo.split(" - ")
-        if len(partes) != 3:
-            continue
-
-        referencia = partes[0].strip()
-        tallas_info = partes[1].strip()
-        precio = int(partes[2].strip())
+        referencia = item["referencia"]
+        precio = item["precio"]
         precio_formateado = "{:,.0f}".format(precio).replace(",", ".")
+        archivo = item["archivo"]
+        tallas = item["tallas"]
 
-        tallas = re.findall(r"(\d+)\((\d+)\)", tallas_info)
-        if talla_filtro != "Todas":
-            if not any(talla_filtro == t for t, _ in tallas):
+        if talla_seleccionada_filtro != "Todas":
+            if not any(t == talla_seleccionada_filtro for t, _ in tallas):
                 continue
 
         # Sección visual
@@ -107,7 +119,7 @@ for archivo in imagenes:
 
             tallas_disponibles = {t: int(c) for t, c in tallas}
             seleccionada = st.radio(
-                f"Talla para {referencia}",
+                f"Talla para {producto_id}",
                 options=list(tallas_disponibles.keys()),
                 key=f"tallas_{archivo}",
                 horizontal=True,
@@ -115,7 +127,7 @@ for archivo in imagenes:
             )
 
         # Mostrar controles de cantidad
-        clave = f"{archivo}_{seleccionada}"
+        clave = f"{producto_id}_{seleccionada}"
         cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
 
         with col_qty:
@@ -135,7 +147,7 @@ for archivo in imagenes:
                     else:
                         st.session_state.carrito[clave] = {
                             "referencia": referencia,
-                            "precio": precio,
+                            "precio": precio_formateado,
                             "talla": seleccionada,
                             "cantidad": 1
                         }
