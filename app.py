@@ -148,6 +148,7 @@ for archivo in imagenes:
                                 "cantidad": 1
                             }
 
+
         st.markdown("---")
     except Exception as e:
         st.warning(f"Error con archivo '{archivo}': {e}")
