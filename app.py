@@ -147,7 +147,7 @@ for producto_id, item in catalogo.items():
                     else:
                         st.session_state.carrito[clave] = {
                             "referencia": referencia,
-                            "precio": precio_formateado,
+                            "precio": precio,
                             "talla": seleccionada,
                             "cantidad": 1
                         }
