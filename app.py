@@ -4,133 +4,108 @@ import re
 
 st.set_page_config(page_title="Importivos León", layout="wide")
 
-# Inicializar el carrito en session_state si no existe
+# Inicializar carrito en la sesión
 if "carrito" not in st.session_state:
     st.session_state.carrito = {}
 
-carpeta = "catalogo"
+# Encabezado con logo y título
+col1, col2 = st.columns([1, 5])
+with col1:
+    st.image("logo.png", width=150)
+with col2:
+    st.title("Nuestro Catálogo Deportivo")
 
-# Soportar .jfif además de otras extensiones
+# Dirección del local
+st.markdown("<p style='font-size:16px; color: gray;'>Calle 52 # 16-31 Barrio San Miguel</p>", unsafe_allow_html=True)
+
+# Mostrar carrito
+st.markdown("## 🛒 Carrito de compras")
+if st.session_state.carrito:
+    total = 0
+    for key, item in st.session_state.carrito.items():
+        subtotal = item["precio"] * item["cantidad"]
+        total += subtotal
+        col1, col2, col3 = st.columns([3, 2, 2])
+        with col1:
+            st.markdown(f"**{item['referencia']}**")
+        with col2:
+            st.markdown(f"{item['cantidad']} unidad(es)")
+        with col3:
+            st.markdown(f"${subtotal:,.0f}".replace(",", "."))
+
+    st.success(f"**Total a pagar:** ${total:,.0f}".replace(",", "."))
+    if st.button("🧹 Vaciar carrito"):
+        st.session_state.carrito.clear()
+else:
+    st.info("Tu carrito está vacío.")
+
+    
+# Carpeta del catálogo
+carpeta = "catalogo"
 extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
-
 imagenes.sort()
 
-# Extraer tallas únicas de todos los archivos
-tallas_disponibles = sorted({t for img in imagenes for t in re.findall(r"(\d{2})\(", img)})
+# Obtener todas las tallas únicas desde los nombres de archivos
+tallas_disponibles = set()
+patron = re.compile(r"- ([\d,()]+) -")
+for archivo in imagenes:
+    nombre_archivo = os.path.splitext(archivo)[0]
+    coincidencia = patron.search(nombre_archivo)
+    if coincidencia:
+        tallas_info = coincidencia.group(1)
+        tallas = re.findall(r"\d+", tallas_info)
+        tallas_disponibles.update(tallas)
 
-# FILTRO por talla
-talla_seleccionada = st.selectbox("Filtrar por talla", ["Todas"] + tallas_disponibles)
+tallas_ordenadas = sorted(tallas_disponibles, key=int)
+talla_seleccionada = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
-# --- Funciones para carrito ---
-
-def agregar_al_carrito(ref, talla, cantidad):
-    key = f"{ref}_{talla}"
-    if key in st.session_state.carrito:
-        st.session_state.carrito[key] += cantidad
-    else:
-        st.session_state.carrito[key] = cantidad
-    if st.session_state.carrito[key] <= 0:
-        del st.session_state.carrito[key]
-
-def vaciar_carrito():
-    st.session_state.carrito = {}
-
-# --- Mostrar carrito arriba ---
-st.header("Carrito de compras")
-
-if not st.session_state.carrito:
-    st.write("El carrito está vacío")
-else:
-    total = 0
-    for key, cantidad in st.session_state.carrito.items():
-        ref, talla = key.rsplit("_", 1)
-        # Buscar precio en las imágenes para este ref
-        precio = None
-        for img in imagenes:
-            nombre_archivo = os.path.splitext(img)[0]
-            partes = nombre_archivo.split(" - ")
-            if len(partes) >= 3:
-                referencia = partes[0].strip()
-                if referencia == ref:
-                    try:
-                        precio = int(partes[-1])
-                    except:
-                        precio = 0
-                    break
-        if precio is None:
-            precio = 0
-        subtotal = precio * cantidad
-        total += subtotal
-        precio_formateado = "{:,.0f}".format(precio)
-        st.write(f"{ref} - Talla {talla}: {cantidad} pares x ${precio_formateado} = ${subtotal:,}")
-
-    st.markdown(f"**Total: ${total:,}**")
-
-if st.button("Vaciar carrito"):
-    vaciar_carrito()
-
-st.markdown("---")
-
-# Mostrar catálogo
-st.markdown("<h2>Catálogo de Zapatos</h2>", unsafe_allow_html=True)
-
+# Mostrar productos según filtro
 for archivo in imagenes:
     try:
-        nombre_archivo = os.path.splitext(archivo)[0]  # quita extensión
+        nombre_archivo = os.path.splitext(archivo)[0]
         partes = nombre_archivo.split(" - ")
-        if len(partes) < 3:
-            st.warning(f"El archivo '{archivo}' no tiene el formato esperado: 'referencia - tallas - precio.ext'")
+        if len(partes) != 3:
+            st.warning(f"Formato inválido en el archivo: {archivo}")
             continue
 
         referencia = partes[0].strip()
-        tallas_str = partes[1].strip()  # ej: "37(1),38(2),39(3)"
-        precio_str = partes[2].strip()
-        precio = int(precio_str)
+        tallas_info = partes[1].strip()
+        precio = int(partes[2].strip())
+        precio_formateado = "{:,.0f}".format(precio).replace(",", ".")
 
-        # Parsear tallas y cantidades
-        tallas = re.findall(r"(\d{2})\((\d+)\)", tallas_str)  # lista de tuples (talla, cantidad)
+        # Obtener tallas y cantidades como lista de tuplas (talla, cantidad)
+        tallas = re.findall(r"(\d+)\((\d+)\)", tallas_info)
+        if talla_seleccionada != "Todas":
+            if not any(talla_seleccionada == t for t, _ in tallas):
+                continue  # No mostrar si la talla no está
 
-        # Filtrar por talla seleccionada
-        if talla_seleccionada != "Todas" and not any(t == talla_seleccionada for t, _ in tallas):
-            continue
-
-        # Mostrar cada producto en 3 columnas
-        col1, col2, col3 = st.columns([2, 4, 1])
+        # Crear columnas para imagen, referencia y precio/botón
+        col1, col2, col3 = st.columns([2, 3, 2])
 
         with col1:
             st.image(os.path.join(carpeta, archivo), use_container_width=True)
 
         with col2:
             st.markdown(f"### {referencia}")
-            for t, c in tallas:
-                st.markdown(f"Talla {t}: {c} pares")
+            for talla, cantidad in tallas:
+                plural = "pares" if int(cantidad) > 1 else "par"
+                st.markdown(f"- Talla {talla}: {cantidad} {plural}")
 
         with col3:
-            precio_formateado = "{:,.0f}".format(precio)
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
-
-            # Mostrar botones para modificar cantidad en carrito por talla
-            for t, c in tallas:
-                key_minus = f"menos_{referencia}_{t}"
-                key_plus = f"mas_{referencia}_{t}"
-                cantidad_actual = st.session_state.carrito.get(f"{referencia}_{t}", 0)
-
-                cols = st.columns([1, 1, 2])  # para botones y mostrar cantidad
-
-                with cols[0]:
-                    if st.button("-1", key=key_minus):
-                        if cantidad_actual > 0:
-                            agregar_al_carrito(referencia, t, -1)
-
-                with cols[1]:
-                    if st.button("+1", key=key_plus):
-                        agregar_al_carrito(referencia, t, 1)
-
-                with cols[2]:
-                    st.write(f"Cantidad: {cantidad_actual}")
+            if st.button(f"Agregar al carrito - {archivo}"):
+                if archivo not in st.session_state.carrito:
+                    st.session_state.carrito[archivo] = {
+                        "referencia": referencia,
+                        "precio": precio,
+                        "cantidad": 1
+                    }
+                else:
+                    st.session_state.carrito[archivo]["cantidad"] += 1
 
         st.markdown("---")
-
     except Exception as e:
-        st.warning(f"Error con el archivo '{archivo}': {e}")
+        st.warning(f"Error con archivo '{archivo}': {e}")
+
+
