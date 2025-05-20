@@ -136,10 +136,11 @@ for producto_id, item in catalogo.items():
                 with col_m:
                     if st.button("➖", key=f"menos_{clave}"):
                         if clave in st.session_state.carrito:
-                            st.session_state.carrito[clave]["cantidad"] -= 1
-                            if st.session_state.carrito[clave]["cantidad"] <= 0:
-                                del st.session_state.carrito[clave]
-                            st.experimental_rerun()
+                            if st.session_state.carrito[clave]["cantidad"] > 0:
+                                st.session_state.carrito[clave]["cantidad"] -= 1
+                                if st.session_state.carrito[clave]["cantidad"] <= 0:
+                                    del st.session_state.carrito[clave]
+                                st.rerun()
                 with col_c:
                     st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
                 with col_p:
@@ -153,7 +154,7 @@ for producto_id, item in catalogo.items():
                                 "talla": seleccionada,
                                 "cantidad": 1
                             }
-                        st.experimental_rerun()
+                        st.rerun()
 
 
 
