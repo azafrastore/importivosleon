@@ -155,6 +155,7 @@ for producto_id, item in catalogo.items():
                         }
                     st.experimental_rerun()
 
+
         st.markdown("---")
     except Exception as e:
         st.warning(f"Error con archivo '{archivo}': {e} ")
