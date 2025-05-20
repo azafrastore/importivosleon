@@ -47,17 +47,13 @@ else:
 if st.session_state.carrito:
     mensaje = "Hola, quiero hacer el siguiente pedido:\n\n"
     total = 0
-
     for item in st.session_state.carrito.values():
         mensaje += f"- {item['referencia']} (Talla: {item['talla']}) x {item['cantidad']}\n"
         total += item['cantidad'] * item['precio']
-    
     mensaje += f"\nTotal: ${total:,.0f}"
-    
     mensaje_codificado = urllib.parse.quote(mensaje)
     numero_whatsapp = "+573115225576"
     url_whatsapp = f"https://api.whatsapp.com/send?phone={numero_whatsapp}&text={mensaje_codificado}"
-    
     st.markdown(
         f"<a href='{url_whatsapp}' target='_blank'>"
         f"<button style='background-color:#25D366;color:white;padding:10px 15px;border:none;border-radius:5px;'>"
@@ -85,7 +81,7 @@ for archivo in imagenes:
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
 talla_seleccionada_filtro = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
-# Mostrar catálogo con botones compactos de talla y botones separados para cantidad
+# Mostrar catálogo
 for archivo in imagenes:
     try:
         nombre_archivo = os.path.splitext(archivo)[0]
@@ -113,31 +109,14 @@ for archivo in imagenes:
             st.markdown(f"### {referencia}")
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
-            # 1. Botones compactos de tallas (usando columnas juntos, sin espacio extra)
+            # Mostrar botones de tallas
             cols_tallas = st.columns(len(tallas))
             for idx, (t, c) in enumerate(tallas):
                 disabled = int(c) == 0
                 with cols_tallas[idx]:
                     if st.button(f"{t}", key=f"talla_{archivo}_{t}", disabled=disabled):
                         st.session_state.talla_seleccionada = f"{archivo}|{t}"
-
-            # 2. Si esta es la talla seleccionada, mostrar controles de cantidad separados
-            selected = st.session_state.get('talla_seleccionada')
-            if selected == f"{archivo}|{t}":
-                clave = f"{archivo}_{t}"
-                cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
-
-                col_minus, col_qty, col_plus = st.columns([1, 1, 1])
-                with col_minus:
-                    if st.button("−", key=f"menos_{clave}"):
-                        if cantidad_actual > 0:
-                            st.session_state.carrito[clave]["cantidad"] -= 1
-                            if st.session_state.carrito[clave]["cantidad"] <= 0:
-                                del st.session_state.carrito[clave]
-                with col_qty:
-                    st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
-                with col_plus:
-                    if st.button("+", key=f"mas_{clave}"):
+                        clave = f"{archivo}_{t}"
                         if clave in st.session_state.carrito:
                             st.session_state.carrito[clave]["cantidad"] += 1
                         else:
@@ -148,6 +127,29 @@ for archivo in imagenes:
                                 "cantidad": 1
                             }
 
+            # Mostrar controles de cantidad si hay una talla seleccionada para este producto
+            selected = st.session_state.get('talla_seleccionada')
+            if selected and selected.startswith(archivo):
+                _, talla = selected.split("|")
+                clave = f"{archivo}_{talla}"
+                cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
+
+                col_minus, col_qty, col_plus = st.columns([1, 1, 1])
+                with col_minus:
+                    if st.button("−", key=f"menos_{clave}"):
+                        if clave in st.session_state.carrito:
+                            st.session_state.carrito[clave]["cantidad"] -= 1
+                            if st.session_state.carrito[clave]["cantidad"] <= 0:
+                                del st.session_state.carrito[clave]
+                                st.session_state.talla_seleccionada = None
+
+                with col_qty:
+                    st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
+
+                with col_plus:
+                    if st.button("+", key=f"mas_{clave}"):
+                        if clave in st.session_state.carrito:
+                            st.session_state.carrito[clave]["cantidad"] += 1
 
         st.markdown("---")
     except Exception as e:
