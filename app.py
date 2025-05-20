@@ -5,11 +5,9 @@ import urllib.parse
 
 st.set_page_config(page_title="Importivos León", layout="wide")
 
-# Inicializar carrito y talla seleccionada en la sesión
+# Inicializar carrito en la sesión
 if "carrito" not in st.session_state:
     st.session_state.carrito = {}
-if "talla_seleccionada" not in st.session_state:
-    st.session_state.talla_seleccionada = None
 
 # Encabezado con logo y título
 col1, col2 = st.columns([1, 5])
@@ -18,7 +16,7 @@ with col1:
 with col2:
     st.title("Nuestro Catálogo Deportivo")
 
-# Dirección del local
+# Dirección
 st.markdown("<p style='font-size:16px; color: gray;'>Bucaramanga</p>", unsafe_allow_html=True)
 
 # Mostrar carrito
@@ -39,11 +37,10 @@ if st.session_state.carrito:
     st.success(f"**Total a pagar:** ${total:,.0f}".replace(",", "."))
     if st.button("🧹 Vaciar carrito"):
         st.session_state.carrito.clear()
-        st.session_state.talla_seleccionada = None
 else:
     st.info("Tu carrito está vacío.")
 
-# Botón para enviar pedido por WhatsApp si hay items
+# Botón para enviar pedido por WhatsApp
 if st.session_state.carrito:
     mensaje = "Hola, quiero hacer el siguiente pedido:\n\n"
     total = 0
@@ -61,13 +58,13 @@ if st.session_state.carrito:
         unsafe_allow_html=True
     )
 
-# Cargar imágenes catálogo
+# Cargar catálogo
 carpeta = "catalogo"
 extensiones_validas = (".png", ".jpg", ".jpeg", ".webp", ".jfif")
 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones_validas)]
 imagenes.sort()
 
-# Extraer tallas disponibles para filtro
+# Filtrar tallas disponibles
 tallas_disponibles = set()
 patron = re.compile(r"- ([\d,()]+) -")
 for archivo in imagenes:
@@ -79,7 +76,7 @@ for archivo in imagenes:
         tallas_disponibles.update(tallas)
 
 tallas_ordenadas = sorted(tallas_disponibles, key=int)
-talla_seleccionada_filtro = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
+talla_filtro = st.selectbox("Filtrar por talla", ["Todas"] + tallas_ordenadas)
 
 # Mostrar catálogo
 for archivo in imagenes:
@@ -87,7 +84,6 @@ for archivo in imagenes:
         nombre_archivo = os.path.splitext(archivo)[0]
         partes = nombre_archivo.split(" - ")
         if len(partes) != 3:
-            st.warning(f"Formato inválido en el archivo: {archivo}")
             continue
 
         referencia = partes[0].strip()
@@ -95,61 +91,54 @@ for archivo in imagenes:
         precio = int(partes[2].strip())
         precio_formateado = "{:,.0f}".format(precio).replace(",", ".")
 
-        # tallas como lista (talla, cantidad)
         tallas = re.findall(r"(\d+)\((\d+)\)", tallas_info)
-        if talla_seleccionada_filtro != "Todas":
-            if not any(talla_seleccionada_filtro == t for t, _ in tallas):
-                continue  # No mostrar si filtro no coincide
+        if talla_filtro != "Todas":
+            if not any(talla_filtro == t for t, _ in tallas):
+                continue
 
-        # Mostrar imagen y referencia
-        col1, col2 = st.columns([2, 3])
-        with col1:
+        # Sección visual
+        col_img, col_info, col_qty = st.columns([2, 3, 1])
+        with col_img:
             st.image(os.path.join(carpeta, archivo), width=350)
-        with col2:
+
+        with col_info:
             st.markdown(f"### {referencia}")
             st.markdown(f"<h4 style='color: green;'>${precio_formateado}</h4>", unsafe_allow_html=True)
 
-            # Mostrar botones de tallas
-            cols_tallas = st.columns(len(tallas))
-            for idx, (t, c) in enumerate(tallas):
-                disabled = int(c) == 0
-                with cols_tallas[idx]:
-                    if st.button(f"{t}", key=f"talla_{archivo}_{t}", disabled=disabled):
-                        st.session_state.talla_seleccionada = f"{archivo}|{t}"
-                        clave = f"{archivo}_{t}"
-                        if clave in st.session_state.carrito:
-                            st.session_state.carrito[clave]["cantidad"] += 1
-                        else:
-                            st.session_state.carrito[clave] = {
-                                "referencia": referencia,
-                                "precio": precio,
-                                "talla": t,
-                                "cantidad": 1
-                            }
+            tallas_disponibles = {t: int(c) for t, c in tallas}
+            seleccionada = st.radio(
+                f"Talla para {referencia}",
+                options=list(tallas_disponibles.keys()),
+                key=f"tallas_{archivo}",
+                horizontal=True,
+                index=0 if tallas_disponibles else None,
+            )
 
-            # Mostrar controles de cantidad si hay una talla seleccionada para este producto
-            selected = st.session_state.get('talla_seleccionada')
-            if selected and selected.startswith(archivo):
-                _, talla = selected.split("|")
-                clave = f"{archivo}_{talla}"
-                cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
+        # Mostrar controles de cantidad
+        clave = f"{archivo}_{seleccionada}"
+        cantidad_actual = st.session_state.carrito.get(clave, {"cantidad": 0})["cantidad"]
 
-                col_minus, col_qty, col_plus = st.columns([1, 1, 1])
-                with col_minus:
-                    if st.button("−", key=f"menos_{clave}"):
-                        if clave in st.session_state.carrito:
-                            st.session_state.carrito[clave]["cantidad"] -= 1
-                            if st.session_state.carrito[clave]["cantidad"] <= 0:
-                                del st.session_state.carrito[clave]
-                                st.session_state.talla_seleccionada = None
-
-                with col_qty:
-                    st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
-
-                with col_plus:
-                    if st.button("+", key=f"mas_{clave}"):
-                        if clave in st.session_state.carrito:
-                            st.session_state.carrito[clave]["cantidad"] += 1
+        with col_qty:
+            col_m, col_c, col_p = st.columns([1, 1, 1])
+            with col_m:
+                if st.button("−", key=f"menos_{clave}"):
+                    if clave in st.session_state.carrito:
+                        st.session_state.carrito[clave]["cantidad"] -= 1
+                        if st.session_state.carrito[clave]["cantidad"] <= 0:
+                            del st.session_state.carrito[clave]
+            with col_c:
+                st.markdown(f"<div style='text-align:center; font-weight:bold;'>{cantidad_actual}</div>", unsafe_allow_html=True)
+            with col_p:
+                if st.button("+", key=f"mas_{clave}"):
+                    if clave in st.session_state.carrito:
+                        st.session_state.carrito[clave]["cantidad"] += 1
+                    else:
+                        st.session_state.carrito[clave] = {
+                            "referencia": referencia,
+                            "precio": precio,
+                            "talla": seleccionada,
+                            "cantidad": 1
+                        }
 
         st.markdown("---")
     except Exception as e:
